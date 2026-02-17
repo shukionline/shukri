@@ -6,6 +6,7 @@
   <title>SHUKRI STORE - Dukaankaaga</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <style>
+    /* (نفس التنسيقات السابقة بدون تغيير) */
     * { box-sizing: border-box; }
     body { margin:0; font-family:'Segoe UI', sans-serif; background:#f3f4f6; }
     header { background:#0f172a; color:white; padding:20px; text-align:center; font-size:28px; font-weight:bold; box-shadow:0 4px 6px rgba(0,0,0,0.1); position:relative; }
@@ -97,10 +98,10 @@
 </div>
 
 <script>
-  // Supabase setup
+  // Supabase setup - تم تغيير الاسم إلى supabaseClient
   const supabaseUrl = 'https://fmhfxtyyblqgvhakfwmz.supabase.co';
   const supabaseKey = 'sb_publishable_nJAqs78euR6NRjyQPvxC7w_Ttf0WqnJ';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
   let products = [];
   let cart = [];
@@ -108,7 +109,7 @@
 
   // Load products from Supabase
   async function loadProducts() {
-    const { data, error } = await supabase.from('products').select('*').order('id', { ascending:true });
+    const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: true });
     if (error) {
       console.error(error);
       alert('Waxaa jira qalad loading alaabta');
@@ -169,7 +170,7 @@
       return;
     }
 
-    const { data, error } = await supabase.from('products').insert([{ name, price, discount, image }]);
+    const { data, error } = await supabaseClient.from('products').insert([{ name, price, discount, image }]);
     if (error) {
       alert('Qalad ayaa dhacay: ' + error.message);
       return;
@@ -184,7 +185,7 @@
 
   // Delete product
   async function deleteProduct(id) {
-    const { data, error } = await supabase.from('products').delete().eq('id', id);
+    const { data, error } = await supabaseClient.from('products').delete().eq('id', id);
     if (error) {
       alert('Qalad ayaa dhacay: ' + error.message);
       return;
@@ -241,7 +242,7 @@
                       <button onclick="removeItem(${i})">✖️</button>`;
       list.appendChild(li);
     });
-    document.getElementById("total").textContent = total;
+    document.getElementById("total").textContent = total.toFixed(2);
     document.getElementById("cartCount").textContent = cart.length;
   }
 
@@ -249,7 +250,7 @@
     if (cart.length === 0) { alert("Sareedku waa madhan!"); return; }
     let message = "*Dalabkayga cusub:*%0A";
     cart.forEach(item => message += `• ${item.name} - $${item.price}%0A`);
-    message += `----------------%0A*Wadarta: $${total}*`;
+    message += `----------------%0A*Wadarta: $${total.toFixed(2)}*`;
     window.open("https://wa.me/252614837293?text=" + message);
   }
 
