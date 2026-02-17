@@ -1,234 +1,828 @@
 <!DOCTYPE html>
 <html lang="so">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SHUKRI STORE - Dukaankaaga</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
-  <style>
-    /* نفس التنسيقات السابقة بدون تغيير */
-    * { box-sizing: border-box; }
-    body { margin:0; font-family:'Segoe UI', sans-serif; background:#f3f4f6; }
-    header { background:#0f172a; color:white; padding:20px; text-align:center; font-size:28px; font-weight:bold; box-shadow:0 4px 6px rgba(0,0,0,0.1); position:relative; }
-    #adminBtn { position:absolute; left:20px; top:20px; background:#475569; color:white; border:none; padding:8px 16px; border-radius:30px; cursor:pointer; font-size:14px; transition:0.3s; }
-    #adminBtn:hover { background:#1e293b; }
-    .search { text-align:center; margin:20px; }
-    .search input { padding:12px 20px; width:90%; max-width:400px; border-radius:50px; border:1px solid #ccc; font-size:16px; outline:none; transition:0.3s; }
-    .search input:focus { border-color:#0284c7; box-shadow:0 0 5px #0284c7; }
-    #cartBtn { position:fixed; top:20px; right:20px; background:#0284c7; color:white; border:none; padding:12px 18px; border-radius:50px; cursor:pointer; z-index:1000; font-size:18px; box-shadow:0 4px 8px rgba(0,0,0,0.2); transition:0.3s; }
-    #cartBtn:hover { background:#0369a1; }
-    #cartCount { background:#dc2626; border-radius:50%; padding:2px 7px; margin-left:5px; font-weight:bold; }
-    .container { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:25px; padding:30px; max-width:1400px; margin:0 auto; }
-    .card { background:white; padding:15px; border-radius:16px; text-align:center; box-shadow:0 6px 12px rgba(0,0,0,0.08); transition:transform 0.3s, box-shadow 0.3s; }
-    .card:hover { transform:translateY(-5px); box-shadow:0 12px 24px rgba(0,0,0,0.15); }
-    .card img { width:100%; height:180px; object-fit:cover; border-radius:12px; background:#f0f0f0; }
-    .card h3 { margin:15px 0 5px; font-size:1.2rem; }
-    .price-container { margin:10px 0; }
-    .original-price { color:#6b7280; font-size:16px; text-decoration:line-through; margin-right:8px; }
-    .final-price { color:#16a34a; font-size:22px; font-weight:bold; }
-    .discount-badge { background:#ef4444; color:white; padding:4px 8px; border-radius:20px; font-size:12px; font-weight:bold; display:inline-block; margin-top:5px; }
-    .card button { background:#0284c7; color:white; border:none; padding:10px 25px; border-radius:30px; cursor:pointer; font-size:16px; transition:0.3s; font-weight:600; margin-top:10px; }
-    .card button:hover { background:#0369a1; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHUKRI STORE</title>
+    <!-- Font Awesome oo ah astaamo -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* -------------------- Qaybta CSS -------------------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    /* Admin panel */
-    .admin-panel { position:fixed; top:80px; left:20px; background:white; padding:20px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.3); width:350px; max-height:80vh; overflow-y:auto; z-index:2000; display:none; }
-    .admin-panel h3 { margin-top:0; display:flex; justify-content:space-between; align-items:center; }
-    .admin-panel .close { background:#9ca3af; border:none; color:white; border-radius:50%; width:30px; height:30px; cursor:pointer; }
-    .admin-panel input, .admin-panel button { width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ccc; }
-    .admin-product-item { display:flex; align-items:center; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; }
-    .admin-product-item img { width:40px; height:40px; object-fit:cover; border-radius:8px; }
-    .admin-product-item .info { flex:1; margin:0 10px; font-size:14px; }
-    .admin-product-item button { background:#ef4444; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer; }
+        body {
+            background-color: #f8f9fa;
+        }
 
-    /* Cart */
-    .cart { position:fixed; top:90px; right:20px; background:white; padding:20px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.2); width:300px; display:none; z-index:999; max-height:70vh; overflow-y:auto; }
-    .cart h3 { margin-top:0; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:10px; }
-    .cart h3 button { background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:14px; }
-    .cart ul { list-style:none; padding:0; margin:15px 0; }
-    .cart li { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; }
-    .cart li button { background:#ef4444; color:white; border:none; border-radius:5px; padding:2px 8px; cursor:pointer; font-size:14px; }
-    .total { font-weight:bold; font-size:1.2rem; text-align:right; margin:15px 0 10px; border-top:1px solid #ddd; padding-top:10px; }
-    .whatsapp { background:#25D366; color:white; border:none; padding:12px; width:100%; border-radius:30px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; }
-    .whatsapp:hover { background:#20bd59; }
-    .clear-cart { background:#6b7280; color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:14px; }
-    .clear-cart:hover { background:#4b5563; }
-  </style>
+        /* Header iyo Navigation */
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            color: #e67e22;
+            font-size: 1.8rem;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .cart-btn {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .cart-btn:hover {
+            background-color: #d35400;
+        }
+
+        .cart-count {
+            background-color: white;
+            color: #e67e22;
+            border-radius: 50%;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .admin-login-btn {
+            background-color: #34495e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.3s;
+        }
+
+        .admin-login-btn:hover {
+            background-color: #2c3e50;
+        }
+
+        /* Qaybta muuqaalka alaabta (Products Grid) */
+        .products-container {
+            padding: 2rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            height: 200px;
+            background-color: #f1f3f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #bdc3c7;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1.2rem;
+        }
+
+        .product-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #e67e22;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart:hover {
+            background-color: #d35400;
+        }
+
+        /* Qaybta Admin Panel (Marka la galo) */
+        .admin-panel-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-panel {
+            background-color: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 1rem;
+        }
+
+        .admin-header h2 {
+            color: #e67e22;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .add-product-form {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .add-product-form h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .product-list-admin {
+            list-style: none;
+        }
+
+        .product-item-admin {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .product-item-admin span {
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.3rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Qaybta Login-ka Admin */
+        .admin-login-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 250;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .login-box h2 {
+            color: #e67e22;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .login-box button {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Qaybta Sareedka (Cart Sidebar) */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 100%;
+            max-width: 380px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease-in-out;
+            z-index: 300;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .cart-header h2 {
+            color: #e67e22;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .cart-item-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .cart-item-info p {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .cart-item-actions button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-footer {
+            border-top: 2px solid #ecf0f1;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .whatsapp-btn {
+            background-color: #25D366;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .clear-cart-btn {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #7f8c8d;
+            border-top: 1px solid #ecf0f1;
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  🛍️ SHUKRI STORE
-  <button id="adminBtn" onclick="promptPassword()">🔐 Maamul</button>
-</header>
-
-<button onclick="toggleCart()" id="cartBtn">
-  🛒 Sareed <span id="cartCount">0</span>
-</button>
-
-<div class="search">
-  <input type="text" id="search" placeholder="Raadi badeecad..." onkeyup="searchProduct()">
-</div>
-
-<div class="container" id="products"></div>
-
-<div class="admin-panel" id="adminPanel">
-  <h3>
-    Maamulka alaabta
-    <button class="close" onclick="toggleAdminPanel()">✖</button>
-  </h3>
-  <h4>Kudar alaab cusub</h4>
-  <input type="text" id="prodName" placeholder="Magaca alaabta">
-  <input type="number" id="prodPrice" placeholder="Qiimaha ($)">
-  <input type="number" id="prodDiscount" placeholder="Dhimis % (Ikhtiyaar)" min="0" max="100">
-  <input type="text" id="prodImage" placeholder="Linkiga sawirka">
-  <button onclick="addProduct()">➕ Ku dar</button>
-  <h4>Alaabta hadda jirta</h4>
-  <div id="adminProductList"></div>
-</div>
-
-<div class="cart">
-  <h3>
-    🛒 Sareedkaaga
-    <button class="clear-cart" onclick="clearCart()">🗑️ Tirtir dhamaan</button>
-  </h3>
-  <ul id="cartItems"></ul>
-  <div class="total">Wadarta: $<span id="total">0</span></div>
-  <button class="whatsapp" onclick="sendWhatsApp()">📱 Ku dalbo WhatsApp</button>
-</div>
-
-<script>
-  // Supabase client
-  const supabaseUrl = 'https://fmhfxtyyblqgvhakfwmz.supabase.co';
-  const supabaseKey = 'sb_publishable_nJAqs78euR6NRjyQPvxC7w_Ttf0WqnJ';
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-  let products = [];
-  let cart = [];
-  let total = 0;
-
-  // Load products from Supabase
-  async function loadProducts() {
-    const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending:true });
-    if (error) {
-      console.error(error);
-      alert('Waxaa jira qalad loading alaabta');
-      return;
-    }
-    products = data;
-    renderProducts();
-  }
-
-  function renderProducts() {
-    const container = document.getElementById('products');
-    container.innerHTML = '';
-    products.forEach(prod => {
-      const finalPrice = prod.discount ? (prod.price - (prod.price * prod.discount / 100)).toFixed(2) : prod.price;
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <img src="${prod.image}" alt="${prod.name}">
-        <h3>${prod.name}</h3>
-        <div class="price-container">
-          ${prod.discount ? `<span class="original-price">$${prod.price}</span>` : ''}
-          <span class="final-price">$${finalPrice}</span>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <h1>🛍️ SHUKRI STORE</h1>
         </div>
-        ${prod.discount ? `<span class="discount-badge">-${prod.discount}%</span>` : ''}
-        <button onclick="addToCart('${prod.name}', ${finalPrice})">🛒 Ku dar</button>
-      `;
-      container.appendChild(card);
-    });
-    renderAdminProductList();
-  }
+        <div class="header-buttons">
+            <button class="admin-login-btn" id="adminLoginBtn"><i class="fas fa-lock"></i> Maamul</button>
+            <button class="cart-btn" id="cartBtn"><i class="fas fa-shopping-cart"></i> Sareed <span class="cart-count" id="cartCount">0</span></button>
+        </div>
+    </header>
 
-  function renderAdminProductList() {
-    const listDiv = document.getElementById('adminProductList');
-    listDiv.innerHTML = '';
-    products.forEach(prod => {
-      const item = document.createElement('div');
-      item.className = 'admin-product-item';
-      item.innerHTML = `
-        <img src="${prod.image}" alt="${prod.name}">
-        <div class="info"><strong>${prod.name}</strong><br>$${prod.price} ${prod.discount ? `(-${prod.discount}%)` : ''}</div>
-        <button onclick="deleteProduct(${prod.id})">✖</button>
-      `;
-      listDiv.appendChild(item);
-    });
-  }
+    <!-- Products Grid -->
+    <main>
+        <div class="products-container" id="productsContainer">
+            <!-- Alaabta waxaa lagu soo bandhigi halkan JS -->
+        </div>
+    </main>
 
-  async function addProduct() {
-    const name = document.getElementById('prodName').value.trim();
-    const price = parseFloat(document.getElementById('prodPrice').value);
-    const discount = parseFloat(document.getElementById('prodDiscount').value) || 0;
-    const image = document.getElementById('prodImage').value.trim();
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2><i class="fas fa-shopping-cart"></i> Sareedkaaga</h2>
+            <button class="close-cart" id="closeCartBtn">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Alaabta sareedka -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Wadarta:</span>
+                <span id="cartTotalPrice">$0</span>
+            </div>
+            <button class="whatsapp-btn" id="whatsappOrderBtn"><i class="fab fa-whatsapp"></i> Ku dalbo WhatsApp</button>
+            <button class="clear-cart-btn" id="clearCartBtn"><i class="fas fa-trash-alt"></i> Tirtir dhamaan</button>
+        </div>
+    </div>
 
-    if (!name || isNaN(price) || !image) {
-      alert('Fadlan buuxi dhamaan beelaha loo baahan yahay');
-      return;
-    }
+    <!-- Admin Login Popup -->
+    <div class="admin-login-overlay" id="adminLoginOverlay">
+        <div class="login-box">
+            <h2>🔐 Gelitaanka Maamulka</h2>
+            <input type="password" id="adminPassword" placeholder="Furaha sirta ah">
+            <button id="submitAdminLogin">Gal</button>
+            <button style="background:#95a5a6; margin-top:0.5rem;" id="closeLoginBtn">Xidh</button>
+        </div>
+    </div>
 
-    const { data, error } = await supabaseClient.from('products').insert([{ name, price, discount, image }]);
-    if (error) { alert('Qalad ayaa dhacay: ' + error.message); return; }
-    loadProducts();
-    document.getElementById('prodName').value = '';
-    document.getElementById('prodPrice').value = '';
-    document.getElementById('prodDiscount').value = '';
-    document.getElementById('prodImage').value = '';
-    alert('Alaabta si guul leh ayaa loo kudaray');
-  }
+    <!-- Admin Panel -->
+    <div class="admin-panel-overlay" id="adminPanelOverlay">
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>⚙️ Maamulka Alaabta</h2>
+                <button class="close-btn" id="closeAdminPanelBtn">&times;</button>
+            </div>
 
-  async function deleteProduct(id) {
-    const { data, error } = await supabaseClient.from('products').delete().eq('id', id);
-    if (error) { alert('Qalad ayaa dhacay: ' + error.message); return; }
-    loadProducts();
-  }
+            <!-- Form-ka ku darista alaabta cusub -->
+            <div class="add-product-form">
+                <h3>➕ Ku dar alaab cusub</h3>
+                <div class="form-group">
+                    <label>Magaca Alaabta</label>
+                    <input type="text" id="productName" placeholder="Tusaale: Shaadh Cas">
+                </div>
+                <div class="form-group">
+                    <label>Qiimaha ($)</label>
+                    <input type="number" id="productPrice" placeholder="10.99">
+                </div>
+                <div class="form-group">
+                    <label>URL Sawirka (Ikhtiyaar)</label>
+                    <input type="text" id="productImage" placeholder="https://...">
+                </div>
+                <button class="btn-primary" id="addProductBtn">Ku dar alaabta</button>
+            </div>
 
-  function promptPassword() {
-    const password = prompt('Gali erayga sirta ah ee maamulka:');
-    if (password === 'Shukri@2026#Admin') {
-      document.getElementById('adminPanel').style.display = 'block';
-    } else { alert('Erayga sirta ah waa khalad'); }
-  }
+            <!-- Liiska alaabta hadda jirta -->
+            <h3>📦 Alaabta hadda jirta</h3>
+            <ul class="product-list-admin" id="productListAdmin">
+                <!-- Alaabta waxaa lagu soo bandhigi halkan -->
+            </ul>
+        </div>
+    </div>
 
-  function toggleAdminPanel() {
-    const panel = document.getElementById('adminPanel');
-    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-  }
+    <footer>
+        &copy; 2025 SHUKRI STORE - Xaqiiska dhammaan waa la dhawray
+    </footer>
 
-  function toggleCart() {
-    const cartBox = document.querySelector(".cart");
-    cartBox.style.display = cartBox.style.display === "block" ? "none" : "block";
-  }
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // -------------------- Qaybta JavaScript --------------------
 
-  function addToCart(name, price) {
-    cart.push({ name, price });
-    total += price;
-    updateCart();
-    alert(`✅ ${name} waxaa lagu daray sareedka`);
-  }
+        // 1. Ku xiranka Supabase
+        const SUPABASE_URL = 'https://fmhfxtyyblqgvhakfwmz.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_nJAqs78euR6NRjyQPvxC7w_Ttf0WqnJ';
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function removeItem(index) { total -= cart[index].price; cart.splice(index,1); updateCart(); }
-  function clearCart() { cart=[]; total=0; updateCart(); }
-  function updateCart() {
-    const list=document.getElementById("cartItems"); list.innerHTML='';
-    cart.forEach((item,i)=>{const li=document.createElement("li"); li.innerHTML=`<span>${item.name} - $${item.price}</span><button onclick="removeItem(${i})">✖️</button>`; list.appendChild(li);});
-    document.getElementById("total").textContent=total;
-    document.getElementById("cartCount").textContent=cart.length;
-  }
+        // 2. Xogta sareedka (local storage)
+        let cart = JSON.parse(localStorage.getItem('shukriCart')) || [];
 
-  function sendWhatsApp(){
-    if(cart.length===0){alert("Sareedku waa madhan!"); return;}
-    let message="*Dalabkayga cusub:*%0A";
-    cart.forEach(item=>message+=`• ${item.name} - $${item.price}%0A`);
-    message+=`----------------%0A*Wadarta: $${total}*`;
-    window.open("https://wa.me/252614837293?text="+message);
-  }
+        // 3. Xulashada walxaha HTML
+        const productsContainer = document.getElementById('productsContainer');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const cartBtn = document.getElementById('cartBtn');
+        const closeCartBtn = document.getElementById('closeCartBtn');
+        const cartItemsEl = document.getElementById('cartItems');
+        const cartTotalEl = document.getElementById('cartTotalPrice');
+        const cartCountEl = document.getElementById('cartCount');
+        const whatsappBtn = document.getElementById('whatsappOrderBtn');
+        const clearCartBtn = document.getElementById('clearCartBtn');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const adminLoginOverlay = document.getElementById('adminLoginOverlay');
+        const submitAdminLogin = document.getElementById('submitAdminLogin');
+        const closeLoginBtn = document.getElementById('closeLoginBtn');
+        const adminPasswordInput = document.getElementById('adminPassword');
+        const adminPanelOverlay = document.getElementById('adminPanelOverlay');
+        const closeAdminPanelBtn = document.getElementById('closeAdminPanelBtn');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const productName = document.getElementById('productName');
+        const productPrice = document.getElementById('productPrice');
+        const productImage = document.getElementById('productImage');
+        const productListAdmin = document.getElementById('productListAdmin');
 
-  function searchProduct(){
-    const input=document.getElementById("search").value.toLowerCase();
-    document.querySelectorAll(".card").forEach(card=>{card.style.display=card.innerText.toLowerCase().includes(input)?"block":"none";});
-  }
+        // Furaha sirta ah ee Admin (Waxaad bedeli kartaa)
+        const ADMIN_PASSWORD = 'Shukri@2026#Admin';
 
-  loadProducts();
-</script>
+        // 4. Shaqooyinka guud
+        function updateCartUI() {
+            // Cusboonaysiinta tirada sareedka
+            cartCountEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            // Cusboonaysiinta liiska sareedka
+            if (cartItemsEl) {
+                if (cart.length === 0) {
+                    cartItemsEl.innerHTML = '<p style="text-align:center; color:#7f8c8d;">Sareedkaaga waa madhan</p>';
+                } else {
+                    let html = '';
+                    cart.forEach((item, index) => {
+                        html += `
+                            <div class="cart-item">
+                                <div class="cart-item-info">
+                                    <h4>${item.name}</h4>
+                                    <p>$${item.price} x ${item.quantity}</p>
+                                </div>
+                                <div class="cart-item-actions">
+                                    <button onclick="removeFromCart(${index})">🗑️</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    cartItemsEl.innerHTML = html;
+                }
+            }
+
+            // Cusboonaysiinta wadarta qiimaha
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotalEl.textContent = `$${total.toFixed(2)}`;
+
+            // Kaydinta local storage
+            localStorage.setItem('shukriCart', JSON.stringify(cart));
+        }
+
+        // Shaqada sareedka
+        window.addToCart = function(product) {
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCartUI();
+            // Furo sareedka si otomaatik ah marka alaab la daro
+            cartSidebar.classList.add('open');
+        };
+
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        };
+
+        clearCartBtn.addEventListener('click', () => {
+            cart = [];
+            updateCartUI();
+        });
+
+        whatsappBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Sareedkaaga waa madhan!');
+                return;
+            }
+
+            let message = "👋 Salaam alaikum, Waxaan dalbanayaa:\n\n";
+            let total = 0;
+            cart.forEach(item => {
+                message += `• ${item.name} - $${item.price} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}\n`;
+                total += item.price * item.quantity;
+            });
+            message += `\n💰 Wadarta: $${total.toFixed(2)}`;
+
+            const phoneNumber = '252614837293';
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+        });
+
+        // Furista iyo xirista sareedka
+        cartBtn.addEventListener('click', () => {
+            cartSidebar.classList.add('open');
+        });
+
+        closeCartBtn.addEventListener('click', () => {
+            cartSidebar.classList.remove('open');
+        });
+
+        // 5. Akhrinta alaabta (Read Products)
+        async function loadProducts() {
+            try {
+                const { data: products, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                displayProducts(products);
+                displayAdminProducts(products);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                productsContainer.innerHTML = '<p style="text-align:center; color:red;">Khalad ayaa dhacay soo bandhigida alaabta</p>';
+            }
+        }
+
+        function displayProducts(products) {
+            if (!productsContainer) return;
+
+            if (products.length === 0) {
+                productsContainer.innerHTML = '<p style="text-align:center; color:#7f8c8d;">Weli alaab laguma darin</p>';
+                return;
+            }
+
+            let html = '';
+            products.forEach(product => {
+                html += `
+                    <div class="product-card">
+                        <div class="product-image">
+                            ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : '<i class="fas fa-box-open" style="font-size:3rem; color:#bdc3c7;"></i>'}
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">$${parseFloat(product.price).toFixed(2)}</div>
+                            <button class="add-to-cart" onclick='addToCart(${JSON.stringify(product)})'>
+                                <i class="fas fa-cart-plus"></i> Ku dar sareedka
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            productsContainer.innerHTML = html;
+        }
+
+        // 6. Shaqooyinka Admin
+        function displayAdminProducts(products) {
+            if (!productListAdmin) return;
+
+            if (products.length === 0) {
+                productListAdmin.innerHTML = '<li>Weli alaab ma jirto</li>';
+                return;
+            }
+
+            let html = '';
+            products.forEach(product => {
+                html += `
+                    <li class="product-item-admin">
+                        <span>${product.name} - $${parseFloat(product.price).toFixed(2)}</span>
+                        <button class="delete-btn" onclick="deleteProduct(${product.id})">Tirtir</button>
+                    </li>
+                `;
+            });
+            productListAdmin.innerHTML = html;
+        }
+
+        window.deleteProduct = async function(productId) {
+            if (confirm('Ma hubtaa inaad tirtirto alaabtan?')) {
+                try {
+                    const { error } = await supabase
+                        .from('products')
+                        .delete()
+                        .eq('id', productId);
+
+                    if (error) throw error;
+
+                    // Dib u soo bandhig alaabta
+                    loadProducts();
+                } catch (error) {
+                    console.error('Error deleting product:', error);
+                    alert('Khalad ayaa dhacay tirtirka');
+                }
+            }
+        };
+
+        // Ku darista alaabta
+        addProductBtn.addEventListener('click', async () => {
+            const name = productName.value.trim();
+            const price = parseFloat(productPrice.value);
+            const image = productImage.value.trim() || null;
+
+            if (!name || isNaN(price) || price <= 0) {
+                alert('Fadlan buuxi magaca iyo qiimaha saxda ah');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .insert([{ name, price, image_url: image }])
+                    .select();
+
+                if (error) throw error;
+
+                // Nadiifi foomka
+                productName.value = '';
+                productPrice.value = '';
+                productImage.value = '';
+
+                // Dib u soo bandhig alaabta
+                loadProducts();
+                alert('Alaabta waa la ku daray!');
+            } catch (error) {
+                console.error('Error adding product:', error);
+                alert('Khalad ayaa dhacay ku darista');
+            }
+        });
+
+        // Admin login
+        adminLoginBtn.addEventListener('click', () => {
+            adminLoginOverlay.style.display = 'flex';
+        });
+
+        closeLoginBtn.addEventListener('click', () => {
+            adminLoginOverlay.style.display = 'none';
+            adminPasswordInput.value = '';
+        });
+
+        submitAdminLogin.addEventListener('click', () => {
+            if (adminPasswordInput.value === ADMIN_PASSWORD) {
+                adminLoginOverlay.style.display = 'none';
+                adminPanelOverlay.style.display = 'flex';
+                adminPasswordInput.value = '';
+            } else {
+                alert('Furaha sirta ah waa khalad!');
+            }
+        });
+
+        closeAdminPanelBtn.addEventListener('click', () => {
+            adminPanelOverlay.style.display = 'none';
+        });
+
+        // Xirida windows-ka marka dibadda la riixo
+        window.addEventListener('click', (e) => {
+            if (e.target === adminLoginOverlay) {
+                adminLoginOverlay.style.display = 'none';
+                adminPasswordInput.value = '';
+            }
+            if (e.target === adminPanelOverlay) {
+                adminPanelOverlay.style.display = 'none';
+            }
+        });
+
+        // 7. Bilaawga
+        loadProducts();
+        updateCartUI();
+    </script>
 </body>
 </html>
