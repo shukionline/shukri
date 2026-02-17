@@ -4,31 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SHUKRI STORE - Dukaankaaga</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <style>
-    /* ==== نفس CSS السابق مع بعض التعديلات ==== */
-    * { box-sizing: border-box; margin: 0; padding:0;}
-    body { font-family:'Segoe UI', sans-serif; background:#f3f4f6;}
-    header { background:#0f172a; color:white; text-align:center; font-size:28px; padding:20px; position:relative; box-shadow:0 4px 6px rgba(0,0,0,0.1);}
-    #adminBtn {position:absolute; left:20px; top:20px; background:#475569; color:white; border:none; padding:8px 16px; border-radius:30px; cursor:pointer; font-size:14px;}
-    #adminBtn:hover { background:#1e293b;}
-    .search { text-align:center; margin:20px;}
-    .search input {padding:12px 20px; width:90%; max-width:400px; border-radius:50px; border:1px solid #ccc; font-size:16px;}
-    #cartBtn { position:fixed; top:20px; right:20px; background:#0284c7; color:white; border:none; padding:12px 18px; border-radius:50px; cursor:pointer; z-index:1000; font-size:18px;}
-    #cartCount { background:#dc2626; border-radius:50%; padding:2px 7px; margin-left:5px; font-weight:bold;}
-    .container { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px; padding:30px; max-width:1400px; margin:0 auto;}
-    .card {background:white; padding:15px; border-radius:16px; text-align:center; box-shadow:0 6px 12px rgba(0,0,0,0.08);}
-    .card img { width:100%; height:180px; object-fit:cover; border-radius:12px;}
-    .card h3 { margin:15px 0 5px; font-size:1.2rem;}
-    .price-container { margin:10px 0;}
-    .original-price { text-decoration:line-through; color:#6b7280; margin-right:8px;}
-    .final-price { color:#16a34a; font-weight:bold; font-size:22px;}
-    .discount-badge { background:#ef4444; color:white; padding:4px 8px; border-radius:20px; font-size:12px;}
-    .card button { background:#0284c7; color:white; border:none; padding:10px 25px; border-radius:30px; cursor:pointer; font-weight:600;}
-    .card button:hover { background:#0369a1;}
-    .admin-panel { position:fixed; top:80px; left:20px; background:white; padding:20px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.3); width:350px; max-height:80vh; overflow-y:auto; z-index:2000; display:none;}
-    .cart { position:fixed; top:90px; right:20px; background:white; padding:20px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.2); width:300px; display:none; z-index:999; max-height:70vh; overflow-y:auto;}
-    .whatsapp {background:#25D366; color:white; border:none; padding:12px; width:100%; border-radius:30px; font-weight:bold; cursor:pointer;}
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Segoe UI', sans-serif; background:#f3f4f6; }
+    header { background:#0f172a; color:white; padding:20px; text-align:center; font-size:28px; font-weight:bold; box-shadow:0 4px 6px rgba(0,0,0,0.1); position:relative; }
+    #adminBtn { position:absolute; left:20px; top:20px; background:#475569; color:white; border:none; padding:8px 16px; border-radius:30px; cursor:pointer; font-size:14px; transition:0.3s; }
+    #adminBtn:hover { background:#1e293b; }
+    .search { text-align:center; margin:20px; }
+    .search input { padding:12px 20px; width:90%; max-width:400px; border-radius:50px; border:1px solid #ccc; font-size:16px; outline:none; transition:0.3s; }
+    .search input:focus { border-color:#0284c7; box-shadow:0 0 5px #0284c7; }
+    #cartBtn { position:fixed; top:20px; right:20px; background:#0284c7; color:white; border:none; padding:12px 18px; border-radius:50px; cursor:pointer; z-index:1000; font-size:18px; box-shadow:0 4px 8px rgba(0,0,0,0.2); transition:0.3s; }
+    #cartBtn:hover { background:#0369a1; }
+    #cartCount { background:#dc2626; border-radius:50%; padding:2px 7px; margin-left:5px; font-weight:bold; }
+    .container { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:25px; padding:30px; max-width:1400px; margin:0 auto; }
+    .card { background:white; padding:15px; border-radius:16px; text-align:center; box-shadow:0 6px 12px rgba(0,0,0,0.08); transition:transform 0.3s, box-shadow 0.3s; }
+    .card:hover { transform:translateY(-5px); box-shadow:0 12px 24px rgba(0,0,0,0.15); }
+    .card img { width:100%; height:180px; object-fit:cover; border-radius:12px; background:#f0f0f0; }
+    .card h3 { margin:15px 0 5px; font-size:1.2rem; }
+    .price-container { margin:10px 0; }
+    .original-price { color:#6b7280; font-size:16px; text-decoration:line-through; margin-right:8px; }
+    .final-price { color:#16a34a; font-size:22px; font-weight:bold; }
+    .discount-badge { background:#ef4444; color:white; padding:4px 8px; border-radius:20px; font-size:12px; font-weight:bold; display:inline-block; margin-top:5px; }
+    .card button { background:#0284c7; color:white; border:none; padding:10px 25px; border-radius:30px; cursor:pointer; font-size:16px; transition:0.3s; font-weight:600; margin-top:10px; }
+    .card button:hover { background:#0369a1; }
+
+    /* Admin panel */
+    .admin-panel { position:fixed; top:80px; left:20px; background:white; padding:20px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.3); width:350px; max-height:80vh; overflow-y:auto; z-index:2000; display:none; }
+    .admin-panel h3 { margin-top:0; display:flex; justify-content:space-between; align-items:center; }
+    .admin-panel .close { background:#9ca3af; border:none; color:white; border-radius:50%; width:30px; height:30px; cursor:pointer; }
+    .admin-panel input, .admin-panel button { width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ccc; }
+    .admin-product-item { display:flex; align-items:center; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; }
+    .admin-product-item img { width:40px; height:40px; object-fit:cover; border-radius:8px; }
+    .admin-product-item .info { flex:1; margin:0 10px; font-size:14px; }
+    .admin-product-item button { background:#ef4444; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer; }
+
+    /* Cart */
+    .cart { position:fixed; top:90px; right:20px; background:white; padding:20px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.2); width:300px; display:none; z-index:999; max-height:70vh; overflow-y:auto; }
+    .cart h3 { margin-top:0; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:10px; }
+    .cart h3 button { background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:14px; }
+    .cart ul { list-style:none; padding:0; margin:15px 0; }
+    .cart li { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; }
+    .cart li button { background:#ef4444; color:white; border:none; border-radius:5px; padding:2px 8px; cursor:pointer; font-size:14px; }
+    .total { font-weight:bold; font-size:1.2rem; text-align:right; margin:15px 0 10px; border-top:1px solid #ddd; padding-top:10px; }
+    .whatsapp { background:#25D366; color:white; border:none; padding:12px; width:100%; border-radius:30px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; }
+    .whatsapp:hover { background:#20bd59; }
+    .clear-cart { background:#6b7280; color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:14px; }
+    .clear-cart:hover { background:#4b5563; }
   </style>
 </head>
 <body>
@@ -50,7 +72,10 @@
 
 <!-- Admin panel -->
 <div class="admin-panel" id="adminPanel">
-  <h3>Maamulka alaabta <button onclick="toggleAdminPanel()">✖</button></h3>
+  <h3>
+    Maamulka alaabta
+    <button class="close" onclick="toggleAdminPanel()">✖</button>
+  </h3>
   <h4>Kudar alaab cusub</h4>
   <input type="text" id="prodName" placeholder="Magaca alaabta">
   <input type="number" id="prodPrice" placeholder="Qiimaha ($)">
@@ -62,32 +87,38 @@
 </div>
 
 <div class="cart">
-  <h3>🛒 Sareedkaaga <button onclick="clearCart()">🗑️ Tirtir dhamaan</button></h3>
+  <h3>
+    🛒 Sareedkaaga
+    <button class="clear-cart" onclick="clearCart()">🗑️ Tirtir dhamaan</button>
+  </h3>
   <ul id="cartItems"></ul>
   <div class="total">Wadarta: $<span id="total">0</span></div>
   <button class="whatsapp" onclick="sendWhatsApp()">📱 Ku dalbo WhatsApp</button>
 </div>
 
 <script>
-  // ======= Supabase setup =======
-  const SUPABASE_URL = 'https://fmhfxtyyblqgvhakfwmz.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_nJAqs78euR6NRjyQPvxC7w_Ttf0WqnJ';
-  const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // Supabase setup
+  const supabaseUrl = 'https://fmhfxtyyblqgvhakfwmz.supabase.co';
+  const supabaseKey = 'sb_publishable_nJAqs78euR6NRjyQPvxC7w_Ttf0WqnJ';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // ======= State =======
   let products = [];
   let cart = [];
   let total = 0;
 
-  // ======= Load products from Supabase =======
+  // Load products from Supabase
   async function loadProducts() {
     const { data, error } = await supabase.from('products').select('*').order('id', { ascending:true });
-    if (error) { alert('Error loading products: '+error.message); return; }
-    products = data || [];
+    if (error) {
+      console.error(error);
+      alert('Waxaa jira qalad loading alaabta');
+      return;
+    }
+    products = data;
     renderProducts();
   }
 
-  // ======= Render products =======
+  // Render products
   function renderProducts() {
     const container = document.getElementById('products');
     container.innerHTML = '';
@@ -110,75 +141,126 @@
     renderAdminProductList();
   }
 
-  // ======= Admin panel =======
-  async function renderAdminProductList() {
+  // Admin panel product list
+  function renderAdminProductList() {
     const listDiv = document.getElementById('adminProductList');
     listDiv.innerHTML = '';
     products.forEach(prod => {
       const item = document.createElement('div');
+      item.className = 'admin-product-item';
       item.innerHTML = `
-        <strong>${prod.name}</strong> - $${prod.price} ${prod.discount? `(-${prod.discount}%)`:''} 
+        <img src="${prod.image}" alt="${prod.name}">
+        <div class="info"><strong>${prod.name}</strong><br>$${prod.price} ${prod.discount ? `(-${prod.discount}%)` : ''}</div>
         <button onclick="deleteProduct(${prod.id})">✖</button>
       `;
       listDiv.appendChild(item);
     });
   }
 
+  // Add product
   async function addProduct() {
     const name = document.getElementById('prodName').value.trim();
     const price = parseFloat(document.getElementById('prodPrice').value);
     const discount = parseFloat(document.getElementById('prodDiscount').value) || 0;
     const image = document.getElementById('prodImage').value.trim();
-    if(!name || isNaN(price) || !image) { alert('Fadlan buuxi dhamaan beelaha loo baahan yahay'); return; }
-    const { data, error } = await supabase.from('products').insert([{name, price, discount, image}]);
-    if(error){ alert('Error: '+error.message); return;}
-    document.getElementById('prodName').value='';
-    document.getElementById('prodPrice').value='';
-    document.getElementById('prodDiscount').value='';
-    document.getElementById('prodImage').value='';
+
+    if (!name || isNaN(price) || !image) {
+      alert('Fadlan buuxi dhamaan beelaha loo baahan yahay (Magaca, Qiimaha, Linkiga sawirka)');
+      return;
+    }
+
+    const { data, error } = await supabase.from('products').insert([{ name, price, discount, image }]);
+    if (error) {
+      alert('Qalad ayaa dhacay: ' + error.message);
+      return;
+    }
     loadProducts();
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodPrice').value = '';
+    document.getElementById('prodDiscount').value = '';
+    document.getElementById('prodImage').value = '';
+    alert('Alaabta si guul leh ayaa loo kudaray');
   }
 
-  async function deleteProduct(id){
+  // Delete product
+  async function deleteProduct(id) {
     const { data, error } = await supabase.from('products').delete().eq('id', id);
-    if(error){ alert('Error: '+error.message); return; }
+    if (error) {
+      alert('Qalad ayaa dhacay: ' + error.message);
+      return;
+    }
     loadProducts();
   }
 
-  function promptPassword(){
+  // Admin password
+  function promptPassword() {
     const password = prompt('Gali erayga sirta ah ee maamulka:');
-    if(password==='Shukri@2026#Admin'){ document.getElementById('adminPanel').style.display='block';}
-    else{ alert('Erayga sirta ah waa khalad');}
-  }
-  function toggleAdminPanel(){ const panel=document.getElementById('adminPanel'); panel.style.display = panel.style.display==='block'?'none':'block';}
-
-  // ======= Cart =======
-  function toggleCart(){ const cartBox=document.querySelector(".cart"); cartBox.style.display = cartBox.style.display==='block'?'none':'block';}
-  function addToCart(name, price){ cart.push({name,price}); total+=price; updateCart(); alert(`✅ ${name} waxaa lagu daray sareedka`);}
-  function removeItem(i){ total-=cart[i].price; cart.splice(i,1); updateCart();}
-  function clearCart(){ cart=[]; total=0; updateCart();}
-  function updateCart(){
-    const list=document.getElementById("cartItems"); list.innerHTML='';
-    cart.forEach((item,i)=>{const li=document.createElement('li'); li.innerHTML=`${item.name} - $${item.price} <button onclick="removeItem(${i})">✖</button>`; list.appendChild(li);});
-    document.getElementById("total").textContent=total;
-    document.getElementById("cartCount").textContent=cart.length;
-  }
-  function sendWhatsApp(){
-    if(cart.length===0){alert('Sareedku waa madhan!'); return;}
-    let message="*Dalabkayga cusub:*%0A"; cart.forEach(item=>{message+=`• ${item.name} - $${item.price}%0A`;});
-    message+=`----------------%0A*Wadarta: $${total}*`;
-    window.open("https://wa.me/252614837293?text="+message);
+    if (password === 'Shukri@2026#Admin') {
+      document.getElementById('adminPanel').style.display = 'block';
+    } else {
+      alert('Erayga sirta ah waa khalad');
+    }
   }
 
-  // ======= Search =======
-  function searchProduct(){
-    const input=document.getElementById('search').value.toLowerCase();
-    document.querySelectorAll('.card').forEach(card=>{
-      const text=card.innerText.toLowerCase();
-      card.style.display = text.includes(input)? 'block':'none';
+  function toggleAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Cart functions
+  function toggleCart() {
+    const cartBox = document.querySelector(".cart");
+    cartBox.style.display = cartBox.style.display === "block" ? "none" : "block";
+  }
+
+  function addToCart(name, price) {
+    cart.push({ name, price });
+    total += price;
+    updateCart();
+    alert(`✅ ${name} waxaa lagu daray sareedka`);
+  }
+
+  function removeItem(index) {
+    total -= cart[index].price;
+    cart.splice(index, 1);
+    updateCart();
+  }
+
+  function clearCart() {
+    cart = [];
+    total = 0;
+    updateCart();
+  }
+
+  function updateCart() {
+    const list = document.getElementById("cartItems");
+    list.innerHTML = "";
+    cart.forEach((item,i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${item.name} - $${item.price}</span>
+                      <button onclick="removeItem(${i})">✖️</button>`;
+      list.appendChild(li);
+    });
+    document.getElementById("total").textContent = total;
+    document.getElementById("cartCount").textContent = cart.length;
+  }
+
+  function sendWhatsApp() {
+    if (cart.length === 0) { alert("Sareedku waa madhan!"); return; }
+    let message = "*Dalabkayga cusub:*%0A";
+    cart.forEach(item => message += `• ${item.name} - $${item.price}%0A`);
+    message += `----------------%0A*Wadarta: $${total}*`;
+    window.open("https://wa.me/252614837293?text=" + message);
+  }
+
+  function searchProduct() {
+    const input = document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll(".card").forEach(card => {
+      card.style.display = card.innerText.toLowerCase().includes(input) ? "block" : "none";
     });
   }
 
+  // Load on start
   loadProducts();
 </script>
 </body>
