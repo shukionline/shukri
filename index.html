@@ -1,166 +1,557 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="so">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHUKRI STORE</title>
-
-<style>
-body{
-margin:0;
-font-family:Segoe UI;
-background:#f3f4f6;
-}
-
-header{
-background:#0f172a;
-color:white;
-padding:20px;
-text-align:center;
-font-size:28px;
-font-weight:bold;
-}
-
-/* زر السلة */
-#cartBtn{
-position:fixed;
-top:20px;
-right:20px;
-background:#0284c7;
-color:white;
-border:none;
-padding:12px 18px;
-border-radius:10px;
-cursor:pointer;
-z-index:1000;
-}
-
-/* المنتجات */
-.container{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-padding:30px;
-}
-
-.card{
-background:white;
-padding:15px;
-border-radius:12px;
-text-align:center;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-
-.card img{
-width:100%;
-border-radius:10px;
-}
-
-.price{
-color:#16a34a;
-font-size:20px;
-margin:10px 0;
-}
-
-button{
-background:#0284c7;
-color:white;
-border:none;
-padding:10px 15px;
-border-radius:8px;
-cursor:pointer;
-}
-
-/* السلة */
-.cart{
-position:fixed;
-top:80px;
-right:20px;
-background:white;
-padding:15px;
-border-radius:10px;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
-width:250px;
-display:none;
-z-index:999;
-}
-
-.whatsapp{
-background:#25D366;
-margin-top:10px;
-width:100%;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHUKRI STORE - Dukaankaaga</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f3f4f6;
+    }
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    #adminBtn {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      background: #475569;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+    #adminBtn:hover {
+      background: #1e293b;
+    }
+    .search {
+      text-align: center;
+      margin: 20px;
+    }
+    .search input {
+      padding: 12px 20px;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 50px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      outline: none;
+      transition: 0.3s;
+    }
+    .search input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 5px #0284c7;
+    }
+    #cartBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      z-index: 1000;
+      font-size: 18px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+    #cartBtn:hover {
+      background: #0369a1;
+    }
+    #cartCount {
+      background: #dc2626;
+      border-radius: 50%;
+      padding: 2px 7px;
+      margin-left: 5px;
+      font-weight: bold;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      padding: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #f0f0f0;
+    }
+    .card h3 {
+      margin: 15px 0 5px;
+      font-size: 1.2rem;
+    }
+    .price-container {
+      margin: 10px 0;
+    }
+    .original-price {
+      color: #6b7280;
+      font-size: 16px;
+      text-decoration: line-through;
+      margin-right: 8px;
+    }
+    .final-price {
+      color: #16a34a;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .discount-badge {
+      background: #ef4444;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 5px;
+    }
+    .card button {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    .card button:hover {
+      background: #0369a1;
+    }
+    /* Admin panel */
+    .admin-panel {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      width: 350px;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 2000;
+      display: none;
+    }
+    .admin-panel h3 {
+      margin-top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-panel .close {
+      background: #9ca3af;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+    .admin-panel input, .admin-panel button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .admin-panel button {
+      background: #0284c7;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .admin-panel button:hover {
+      background: #0369a1;
+    }
+    .admin-product-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .admin-product-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .admin-product-item .info {
+      flex: 1;
+      margin: 0 10px;
+      font-size: 14px;
+    }
+    .admin-product-item button {
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      width: auto;
+    }
+    .cart {
+      position: fixed;
+      top: 90px;
+      right: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      width: 300px;
+      display: none;
+      z-index: 999;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .cart h3 {
+      margin-top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .cart h3 button {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .cart ul {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+    }
+    .cart li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart li button {
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 2px 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 1.2rem;
+      text-align: right;
+      margin: 15px 0 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+    .whatsapp {
+      background: #25D366;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .whatsapp:hover {
+      background: #20bd59;
+    }
+    .clear-cart {
+      background: #6b7280;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .clear-cart:hover {
+      background: #4b5563;
+    }
+  </style>
 </head>
-
 <body>
 
-<header>SHUKRI STORE</header>
+<header>
+  🛍️ SHUKRI STORE
+  <button id="adminBtn" onclick="promptPassword()">🔐 Maamul</button>
+</header>
 
-<button onclick="toggleCart()" id="cartBtn">🛒 السلة</button>
+<button onclick="toggleCart()" id="cartBtn">
+  🛒 Sareed <span id="cartCount">0</span>
+</button>
 
-<div class="container">
-
-<div class="card">
-<img src="product1.jpg">
-<h3>منتج 1</h3>
-<div class="price">$20</div>
-<button onclick="addToCart('منتج 1',20)">اضف للسلة</button>
+<div class="search">
+  <input type="text" id="search" placeholder="Raadi badeecad..." onkeyup="searchProduct()">
 </div>
 
-<div class="card">
-<img src="product2.jpg">
-<h3>منتج 2</h3>
-<div class="price">$30</div>
-<button onclick="addToCart('منتج 2',30)">اضف للسلة</button>
-</div>
+<div class="container" id="products"></div>
 
-<div class="card">
-<img src="product3.jpg">
-<h3>منتج 3</h3>
-<div class="price">$50</div>
-<button onclick="addToCart('منتج 3',50)">اضف للسلة</button>
-</div>
-
+<!-- Admin panel -->
+<div class="admin-panel" id="adminPanel">
+  <h3>
+    Maamulka alaabta
+    <button class="close" onclick="toggleAdminPanel()">✖</button>
+  </h3>
+  <h4>Kudar alaab cusub</h4>
+  <input type="text" id="prodName" placeholder="Magaca alaabta">
+  <input type="number" id="prodPrice" placeholder="Qiimaha ($)">
+  <input type="number" id="prodDiscount" placeholder="Dhimis % (Ikhtiyaar)" min="0" max="100">
+  <input type="text" id="prodImage" placeholder="Linkiga sawirka">
+  <button onclick="addProduct()">➕ Ku dar</button>
+  <h4>Alaabta hadda jirta</h4>
+  <div id="adminProductList"></div>
 </div>
 
 <div class="cart">
-<h3>السلة</h3>
-<ul id="cartItems"></ul>
-<p>المجموع: $<span id="total">0</span></p>
-<button class="whatsapp" onclick="sendWhatsApp()">اطلب عبر واتساب</button>
+  <h3>
+    🛒 Sareedkaaga
+    <button class="clear-cart" onclick="clearCart()">🗑️ Tirtir dhamaan</button>
+  </h3>
+  <ul id="cartItems"></ul>
+  <div class="total">Wadarta: $<span id="total">0</span></div>
+  <button class="whatsapp" onclick="sendWhatsApp()">📱 Ku dalbo WhatsApp</button>
 </div>
 
 <script>
-let cart=[];
-let total=0;
+  // Array of products (loaded from localStorage)
+  let products = [];
+  
+  // Default products (used if no stored products)
+  const defaultProducts = [
+    { id: 1, name: '📱 Taleefan', price: 20, discount: 0, image: 'https://via.placeholder.com/200x150?text=Hatoof' },
+    { id: 2, name: '👟 Kabo ciyaareed', price: 30, discount: 0, image: 'https://via.placeholder.com/200x150?text=Kabo' },
+    { id: 3, name: '⌚ Saacad gacmeed', price: 50, discount: 0, image: 'https://via.placeholder.com/200x150?text=Saacad' },
+    { id: 4, name: '💻 Laptop', price: 500, discount: 0, image: 'https://via.placeholder.com/200x150?text=Laptop' },
+    { id: 5, name: '🎧 Barbarad (Bluetooth)', price: 25, discount: 0, image: 'https://via.placeholder.com/200x150?text=Barbarad' },
+    { id: 6, name: '👕 Funaanad cudbi ah', price: 15, discount: 0, image: 'https://via.placeholder.com/200x150?text=Funaanad' },
+    { id: 7, name: '🎒 Boorso dhabarka lagu xidho', price: 40, discount: 0, image: 'https://via.placeholder.com/200x150?text=Boorso' },
+    { id: 8, name: '🕶️ Muraayad qoraxda', price: 18, discount: 0, image: 'https://via.placeholder.com/200x150?text=Muraayad' },
+    { id: 9, name: '⚽ Kubad cagta', price: 12, discount: 0, image: 'https://via.placeholder.com/200x150?text=Kubad' }
+  ];
 
-function toggleCart(){
-let cartBox=document.querySelector(".cart");
-cartBox.style.display = cartBox.style.display === "block" ? "none" : "block";
-}
+  // Load products from localStorage or use defaults
+  function loadProducts() {
+    const stored = localStorage.getItem('shukriStoreProducts');
+    if (stored) {
+      products = JSON.parse(stored);
+    } else {
+      products = defaultProducts;
+      saveProducts();
+    }
+    renderProducts();
+  }
 
-function addToCart(name,price){
-cart.push(name+" - $"+price);
-total+=price;
-updateCart();
-}
+  // Save products to localStorage
+  function saveProducts() {
+    localStorage.setItem('shukriStoreProducts', JSON.stringify(products));
+  }
 
-function updateCart(){
-let list=document.getElementById("cartItems");
-list.innerHTML="";
-cart.forEach(item=>{
-let li=document.createElement("li");
-li.textContent=item;
-list.appendChild(li);
-});
-document.getElementById("total").textContent=total;
-}
+  // Display products on the main page
+  function renderProducts() {
+    const container = document.getElementById('products');
+    container.innerHTML = '';
+    products.forEach(prod => {
+      const finalPrice = prod.discount ? (prod.price - (prod.price * prod.discount / 100)).toFixed(2) : prod.price;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <img src="${prod.image}" alt="${prod.name}">
+        <h3>${prod.name}</h3>
+        <div class="price-container">
+          ${prod.discount ? `<span class="original-price">$${prod.price}</span>` : ''}
+          <span class="final-price">$${finalPrice}</span>
+        </div>
+        ${prod.discount ? `<span class="discount-badge">-${prod.discount}%</span>` : ''}
+        <button onclick="addToCart('${prod.name}', ${finalPrice})">🛒 Ku dar</button>
+      `;
+      container.appendChild(card);
+    });
+    // Update product list in admin panel
+    renderAdminProductList();
+  }
 
-function sendWhatsApp(){
-let message="طلب جديد:%0A"+cart.join("%0A")+"%0Aالمجموع: $"+total;
-window.open("https://wa.me/252614837293?text="+message);
-}
+  // Display products in admin panel with delete buttons
+  function renderAdminProductList() {
+    const listDiv = document.getElementById('adminProductList');
+    listDiv.innerHTML = '';
+    products.forEach(prod => {
+      const item = document.createElement('div');
+      item.className = 'admin-product-item';
+      item.innerHTML = `
+        <img src="${prod.image}" alt="${prod.name}">
+        <div class="info">
+          <strong>${prod.name}</strong><br>
+          $${prod.price} ${prod.discount ? `(-${prod.discount}%)` : ''}
+        </div>
+        <button onclick="deleteProduct(${prod.id})">✖</button>
+      `;
+      listDiv.appendChild(item);
+    });
+  }
+
+  // Add new product
+  function addProduct() {
+    const name = document.getElementById('prodName').value.trim();
+    const price = parseFloat(document.getElementById('prodPrice').value);
+    const discount = parseFloat(document.getElementById('prodDiscount').value) || 0;
+    const image = document.getElementById('prodImage').value.trim();
+
+    if (!name || isNaN(price) || !image) {
+      alert('Fadlan buuxi dhamaan beelaha loo baahan yahay (Magaca, Qiimaha, Linkiga sawirka)');
+      return;
+    }
+
+    const newId = Date.now(); // unique ID
+    products.push({
+      id: newId,
+      name: name,
+      price: price,
+      discount: discount > 0 ? discount : 0,
+      image: image
+    });
+    saveProducts();
+    renderProducts();
+    // Clear input fields
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodPrice').value = '';
+    document.getElementById('prodDiscount').value = '';
+    document.getElementById('prodImage').value = '';
+    alert('Alaabta si guul leh ayaa loo kudaray');
+  }
+
+  // Delete product
+  function deleteProduct(id) {
+    products = products.filter(p => p.id !== id);
+    saveProducts();
+    renderProducts();
+  }
+
+  // Admin password prompt
+  function promptPassword() {
+    const password = prompt('Gali erayga sirta ah ee maamulka:');
+    if (password === 'Shukri@2026#Admin') {
+      document.getElementById('adminPanel').style.display = 'block';
+    } else {
+      alert('Erayga sirta ah waa khalad');
+    }
+  }
+
+  function toggleAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Cart functions (unchanged except for Arabic text replaced)
+  let cart = [];
+  let total = 0;
+
+  function toggleCart() {
+    let cartBox = document.querySelector(".cart");
+    cartBox.style.display = cartBox.style.display === "block" ? "none" : "block";
+  }
+
+  function addToCart(name, price) {
+    cart.push({ name, price });
+    total += price;
+    updateCart();
+    alert(`✅ ${name} waxaa lagu daray sareedka`);
+  }
+
+  function removeItem(index) {
+    total -= cart[index].price;
+    cart.splice(index, 1);
+    updateCart();
+  }
+
+  function clearCart() {
+    cart = [];
+    total = 0;
+    updateCart();
+  }
+
+  function updateCart() {
+    let list = document.getElementById("cartItems");
+    list.innerHTML = "";
+    cart.forEach((item, i) => {
+      let li = document.createElement("li");
+      li.innerHTML = `
+        <span>${item.name} - $${item.price}</span>
+        <button onclick="removeItem(${i})">✖️</button>
+      `;
+      list.appendChild(li);
+    });
+    document.getElementById("total").textContent = total;
+    document.getElementById("cartCount").textContent = cart.length;
+  }
+
+  function sendWhatsApp() {
+    if (cart.length === 0) {
+      alert("Sareedku waa madhan!");
+      return;
+    }
+    let message = "*Dalabkayga cusub:*%0A";
+    cart.forEach(item => {
+      message += `• ${item.name} - $${item.price}%0A`;
+    });
+    message += `----------------%0A*Wadarta: $${total}*`;
+    window.open("https://wa.me/252614837293?text=" + message);
+  }
+
+  function searchProduct() {
+    let input = document.getElementById("search").value.toLowerCase();
+    let cards = document.querySelectorAll(".card");
+    cards.forEach(card => {
+      let text = card.innerText.toLowerCase();
+      card.style.display = text.includes(input) ? "block" : "none";
+    });
+  }
+
+  // Load products on startup
+  loadProducts();
 </script>
 
 </body>
