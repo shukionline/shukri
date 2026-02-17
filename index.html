@@ -6,7 +6,7 @@
   <title>SHUKRI STORE - Dukaankaaga</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <style>
-    /* (نفس التنسيقات السابقة بدون تغيير) */
+    /* نفس التنسيقات السابقة بدون تغيير */
     * { box-sizing: border-box; }
     body { margin:0; font-family:'Segoe UI', sans-serif; background:#f3f4f6; }
     header { background:#0f172a; color:white; padding:20px; text-align:center; font-size:28px; font-weight:bold; box-shadow:0 4px 6px rgba(0,0,0,0.1); position:relative; }
@@ -71,7 +71,6 @@
 
 <div class="container" id="products"></div>
 
-<!-- Admin panel -->
 <div class="admin-panel" id="adminPanel">
   <h3>
     Maamulka alaabta
@@ -98,7 +97,7 @@
 </div>
 
 <script>
-  // Supabase setup - تم تغيير الاسم إلى supabaseClient
+  // Supabase client
   const supabaseUrl = 'https://fmhfxtyyblqgvhakfwmz.supabase.co';
   const supabaseKey = 'sb_publishable_nJAqs78euR6NRjyQPvxC7w_Ttf0WqnJ';
   const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
@@ -109,7 +108,7 @@
 
   // Load products from Supabase
   async function loadProducts() {
-    const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: true });
+    const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending:true });
     if (error) {
       console.error(error);
       alert('Waxaa jira qalad loading alaabta');
@@ -119,7 +118,6 @@
     renderProducts();
   }
 
-  // Render products
   function renderProducts() {
     const container = document.getElementById('products');
     container.innerHTML = '';
@@ -142,7 +140,6 @@
     renderAdminProductList();
   }
 
-  // Admin panel product list
   function renderAdminProductList() {
     const listDiv = document.getElementById('adminProductList');
     listDiv.innerHTML = '';
@@ -158,7 +155,6 @@
     });
   }
 
-  // Add product
   async function addProduct() {
     const name = document.getElementById('prodName').value.trim();
     const price = parseFloat(document.getElementById('prodPrice').value);
@@ -166,15 +162,12 @@
     const image = document.getElementById('prodImage').value.trim();
 
     if (!name || isNaN(price) || !image) {
-      alert('Fadlan buuxi dhamaan beelaha loo baahan yahay (Magaca, Qiimaha, Linkiga sawirka)');
+      alert('Fadlan buuxi dhamaan beelaha loo baahan yahay');
       return;
     }
 
     const { data, error } = await supabaseClient.from('products').insert([{ name, price, discount, image }]);
-    if (error) {
-      alert('Qalad ayaa dhacay: ' + error.message);
-      return;
-    }
+    if (error) { alert('Qalad ayaa dhacay: ' + error.message); return; }
     loadProducts();
     document.getElementById('prodName').value = '';
     document.getElementById('prodPrice').value = '';
@@ -183,24 +176,17 @@
     alert('Alaabta si guul leh ayaa loo kudaray');
   }
 
-  // Delete product
   async function deleteProduct(id) {
     const { data, error } = await supabaseClient.from('products').delete().eq('id', id);
-    if (error) {
-      alert('Qalad ayaa dhacay: ' + error.message);
-      return;
-    }
+    if (error) { alert('Qalad ayaa dhacay: ' + error.message); return; }
     loadProducts();
   }
 
-  // Admin password
   function promptPassword() {
     const password = prompt('Gali erayga sirta ah ee maamulka:');
     if (password === 'Shukri@2026#Admin') {
       document.getElementById('adminPanel').style.display = 'block';
-    } else {
-      alert('Erayga sirta ah waa khalad');
-    }
+    } else { alert('Erayga sirta ah waa khalad'); }
   }
 
   function toggleAdminPanel() {
@@ -208,7 +194,6 @@
     panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
   }
 
-  // Cart functions
   function toggleCart() {
     const cartBox = document.querySelector(".cart");
     cartBox.style.display = cartBox.style.display === "block" ? "none" : "block";
@@ -221,47 +206,28 @@
     alert(`✅ ${name} waxaa lagu daray sareedka`);
   }
 
-  function removeItem(index) {
-    total -= cart[index].price;
-    cart.splice(index, 1);
-    updateCart();
-  }
-
-  function clearCart() {
-    cart = [];
-    total = 0;
-    updateCart();
-  }
-
+  function removeItem(index) { total -= cart[index].price; cart.splice(index,1); updateCart(); }
+  function clearCart() { cart=[]; total=0; updateCart(); }
   function updateCart() {
-    const list = document.getElementById("cartItems");
-    list.innerHTML = "";
-    cart.forEach((item,i) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<span>${item.name} - $${item.price}</span>
-                      <button onclick="removeItem(${i})">✖️</button>`;
-      list.appendChild(li);
-    });
-    document.getElementById("total").textContent = total.toFixed(2);
-    document.getElementById("cartCount").textContent = cart.length;
+    const list=document.getElementById("cartItems"); list.innerHTML='';
+    cart.forEach((item,i)=>{const li=document.createElement("li"); li.innerHTML=`<span>${item.name} - $${item.price}</span><button onclick="removeItem(${i})">✖️</button>`; list.appendChild(li);});
+    document.getElementById("total").textContent=total;
+    document.getElementById("cartCount").textContent=cart.length;
   }
 
-  function sendWhatsApp() {
-    if (cart.length === 0) { alert("Sareedku waa madhan!"); return; }
-    let message = "*Dalabkayga cusub:*%0A";
-    cart.forEach(item => message += `• ${item.name} - $${item.price}%0A`);
-    message += `----------------%0A*Wadarta: $${total.toFixed(2)}*`;
-    window.open("https://wa.me/252614837293?text=" + message);
+  function sendWhatsApp(){
+    if(cart.length===0){alert("Sareedku waa madhan!"); return;}
+    let message="*Dalabkayga cusub:*%0A";
+    cart.forEach(item=>message+=`• ${item.name} - $${item.price}%0A`);
+    message+=`----------------%0A*Wadarta: $${total}*`;
+    window.open("https://wa.me/252614837293?text="+message);
   }
 
-  function searchProduct() {
-    const input = document.getElementById("search").value.toLowerCase();
-    document.querySelectorAll(".card").forEach(card => {
-      card.style.display = card.innerText.toLowerCase().includes(input) ? "block" : "none";
-    });
+  function searchProduct(){
+    const input=document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll(".card").forEach(card=>{card.style.display=card.innerText.toLowerCase().includes(input)?"block":"none";});
   }
 
-  // Load on start
   loadProducts();
 </script>
 </body>
