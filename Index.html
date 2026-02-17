@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHUKRI STORE</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+background:#f3f4f6;
+}
+
+header{
+background:#0f172a;
+color:white;
+padding:20px;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+}
+
+/* زر السلة */
+#cartBtn{
+position:fixed;
+top:20px;
+right:20px;
+background:#0284c7;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:10px;
+cursor:pointer;
+z-index:1000;
+}
+
+/* المنتجات */
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+padding:30px;
+}
+
+.card{
+background:white;
+padding:15px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.card img{
+width:100%;
+border-radius:10px;
+}
+
+.price{
+color:#16a34a;
+font-size:20px;
+margin:10px 0;
+}
+
+button{
+background:#0284c7;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:8px;
+cursor:pointer;
+}
+
+/* السلة */
+.cart{
+position:fixed;
+top:80px;
+right:20px;
+background:white;
+padding:15px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+width:250px;
+display:none;
+z-index:999;
+}
+
+.whatsapp{
+background:#25D366;
+margin-top:10px;
+width:100%;
+}
+</style>
+</head>
+
+<body>
+
+<header>SHUKRI STORE</header>
+
+<button onclick="toggleCart()" id="cartBtn">🛒 السلة</button>
+
+<div class="container">
+
+<div class="card">
+<img src="product1.jpg">
+<h3>منتج 1</h3>
+<div class="price">$20</div>
+<button onclick="addToCart('منتج 1',20)">اضف للسلة</button>
+</div>
+
+<div class="card">
+<img src="product2.jpg">
+<h3>منتج 2</h3>
+<div class="price">$30</div>
+<button onclick="addToCart('منتج 2',30)">اضف للسلة</button>
+</div>
+
+<div class="card">
+<img src="product3.jpg">
+<h3>منتج 3</h3>
+<div class="price">$50</div>
+<button onclick="addToCart('منتج 3',50)">اضف للسلة</button>
+</div>
+
+</div>
+
+<div class="cart">
+<h3>السلة</h3>
+<ul id="cartItems"></ul>
+<p>المجموع: $<span id="total">0</span></p>
+<button class="whatsapp" onclick="sendWhatsApp()">اطلب عبر واتساب</button>
+</div>
+
+<script>
+let cart=[];
+let total=0;
+
+function toggleCart(){
+let cartBox=document.querySelector(".cart");
+cartBox.style.display = cartBox.style.display === "block" ? "none" : "block";
+}
+
+function addToCart(name,price){
+cart.push(name+" - $"+price);
+total+=price;
+updateCart();
+}
+
+function updateCart(){
+let list=document.getElementById("cartItems");
+list.innerHTML="";
+cart.forEach(item=>{
+let li=document.createElement("li");
+li.textContent=item;
+list.appendChild(li);
+});
+document.getElementById("total").textContent=total;
+}
+
+function sendWhatsApp(){
+let message="طلب جديد:%0A"+cart.join("%0A")+"%0Aالمجموع: $"+total;
+window.open("https://wa.me/252614837293?text="+message);
+}
+</script>
+
+</body>
+</html>
