@@ -5,69 +5,130 @@
 <title>Shukri Online - Iibso Alaabta</title>
 <style>
   body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; }
-  label { display: block; margin-top: 10px; }
-  input, textarea, select, button { width: 300px; padding: 5px; margin-top: 5px; }
+  h1,h2,h3 { margin-bottom: 10px; }
+  label, input, textarea, select, button { display: block; margin-top: 10px; padding: 5px; width: 300px; }
   button { background-color: #25D366; color: white; border: none; cursor: pointer; }
   button:hover { opacity: 0.9; }
+  #adminPanel { display: none; margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+  #productsList, #productList { margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<h1>Iibso Alaabta Shukri Online</h1>
+<h1>Shukri Online - Iibso Alaabta</h1>
 
+<h2>Liiska Alaabta</h2>
+<ul id="productsList"></ul>
+
+<h2>Iibso Alaabta</h2>
 <form id="buyForm">
+  <label for="product">Alaabta:</label>
+  <select id="product" required></select>
+
   <label for="name">Magaca:</label>
-  <input type="text" id="name" name="name" required>
+  <input type="text" id="name" placeholder="Magaca" required>
 
   <label for="last_name">Qoyska:</label>
-  <input type="text" id="last_name" name="last_name" required>
+  <input type="text" id="last_name" placeholder="Qoyska" required>
 
   <label for="address">Cinwaanka:</label>
-  <input type="text" id="address" name="address" required>
+  <input type="text" id="address" placeholder="Cinwaanka" required>
 
   <label for="quantity">Tirada:</label>
-  <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+  <input type="number" id="quantity" value="1" min="1" required>
 
-  <label for="message">Fariinta:</label>
-  <textarea id="message" name="message" rows="4"></textarea>
-
-  <label for="product">Alaabta:</label>
-  <select id="product" name="product" required>
-    <option value="Baararka Shukri">Baararka Shukri - $10</option>
-    <option value="Shaaha Macaan">Shaaha Macaan - $15</option>
-    <option value="Biskuutka">Biskuutka - $5</option>
-  </select>
+  <label for="message">Fariintaada:</label>
+  <textarea id="message" rows="4" placeholder="Fariintaada"></textarea>
 
   <button type="submit">Iibso WhatsApp</button>
 </form>
 
-<script>
-const waNumber = "252614837293"; // Lambarkaaga WhatsApp
+<h2>Admin Login</h2>
+<input type="password" id="password" placeholder="Furaha sirta">
+<button onclick="checkPassword()">Gali</button>
 
-document.getElementById('buyForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+<div id="adminPanel">
+  <h2>Ku dar Alaabta Cusub</h2>
+  <input type="text" id="productName" placeholder="Magaca Alaabta">
+  <input type="number" id="productPrice" placeholder="Qiimaha Alaabta">
+  <button onclick="addProduct()">Ku dar Alaabta</button>
 
-  const name = document.getElementById('name').value;
-  const last_name = document.getElementById('last_name').value;
-  const address = document.getElementById('address').value;
-  const quantity = document.getElementById('quantity').value;
-  const message = document.getElementById('message').value;
-  const productSelect = document.getElementById('product');
-  const productText = productSelect.options[productSelect.selectedIndex].text;
-
-  // Qiimaha alaabta ka saar $ oo qaado number
-  const price = parseFloat(productText.match(/\$(\d+)/)[1]);
-  const totalPrice = price * quantity;
-
-  // Fariinta WhatsApp
-  const waMessage = `Magaca: ${name}%0AQoyska: ${last_name}%0ACinwaanka: ${address}%0AAlaabta: ${productText}%0ATirada: ${quantity}%0AQiimaha Guud: $${totalPrice}%0AFariinta: ${message}`;
-
-  // Fur WhatsApp
-  window.open(`https://wa.me/${waNumber}?text=${waMessage}`, '_blank');
-});
-</script>
+  <h3>Alaabta Hore:</h3>
+  <ul id="productList"></ul>
+</div>
 
 <p>Website: <a href="https://shukionline.github.io/shukri/" target="_blank">Shukri Online</a></p>
+
+<script>
+const waNumber = "252614837293"; // Lambarka WhatsApp
+const ADMIN_PASSWORD = "iphone326355";
+let products = [
+  {name:"Baararka Shukri", price:10},
+  {name:"Shaaha Macaan", price:15},
+  {name:"Biskuutka", price:5}
+];
+
+// تحديث قائمة المنتجات
+function updateProductList() {
+  const ul = document.getElementById("productsList");
+  const select = document.getElementById("product");
+  ul.innerHTML = "";
+  select.innerHTML = "";
+  products.forEach((p,index) => {
+    const li = document.createElement("li");
+    li.textContent = `${p.name} - $${p.price}`;
+    ul.appendChild(li);
+    const option = document.createElement("option");
+    option.value = index;
+    option.textContent = `${p.name} - $${p.price}`;
+    select.appendChild(option);
+  });
+}
+
+// تحقق من باسورد الأدمن
+function checkPassword() {
+  const pass = document.getElementById("password").value;
+  if(pass === ADMIN_PASSWORD) {
+    alert("Waad gashay sida Admin!");
+    document.getElementById("adminPanel").style.display = "block";
+  } else {
+    alert("Furaha sirta waa khalad!");
+  }
+}
+
+// إضافة منتج جديد
+function addProduct() {
+  const name = document.getElementById("productName").value;
+  const price = parseFloat(document.getElementById("productPrice").value);
+  if(name && !isNaN(price)) {
+    products.push({name, price});
+    updateProductList();
+    document.getElementById("productName").value = "";
+    document.getElementById("productPrice").value = "";
+    alert("Alaabta waa la ku daray!");
+  } else {
+    alert("Fadlan buuxi magaca iyo qiimaha!");
+  }
+}
+
+// إرسال الطلب عبر WhatsApp
+document.getElementById("buyForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const index = document.getElementById("product").value;
+  const product = products[index];
+  const name = document.getElementById("name").value;
+  const last_name = document.getElementById("last_name").value;
+  const address = document.getElementById("address").value;
+  const quantity = parseInt(document.getElementById("quantity").value);
+  const message = document.getElementById("message").value;
+  const totalPrice = product.price * quantity;
+  const waMessage = `Magaca: ${name}%0AQoyska: ${last_name}%0ACinwaanka: ${address}%0AAlaabta: ${product.name} - $${product.price}%0ATirada: ${quantity}%0AQiimaha Guud: $${totalPrice}%0AFariinta: ${message}`;
+  window.open(`https://wa.me/${waNumber}?text=${waMessage}`, "_blank");
+});
+
+// تهيئة الصفحة
+updateProductList();
+</script>
 
 </body>
 </html>
